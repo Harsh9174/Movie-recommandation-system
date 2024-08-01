@@ -7,13 +7,16 @@ from nltk.stem.porter import PorterStemmer
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import CountVectorizer
 
-# ClickHouse connection details
+CLICKHOUSE_CLOUD_HOSTNAME = os.getenv('CLICKHOUSE_CLOUD_HOSTNAME', 'nxefycxt62.eastus2.azure.clickhouse.cloud')
+CLICKHOUSE_CLOUD_USER = os.getenv('CLICKHOUSE_CLOUD_USER', 'default')
+CLICKHOUSE_CLOUD_PASSWORD = os.getenv('CLICKHOUSE_CLOUD_PASSWORD', 'ZoNOGOZPSv61~')
+
 def get_clickhouse_client():
     client = clickhouse_connect.get_client(
-        host='nxefycxt62.eastus2.azure.clickhouse.cloud',
+        host=CLICKHOUSE_CLOUD_HOSTNAME,
         port=8443,
-        username='default',
-        password='ZoNOGOZPSv61~'
+        username=CLICKHOUSE_CLOUD_USER,
+        password=CLICKHOUSE_CLOUD_PASSWORD
     )
     return client
 
@@ -26,15 +29,15 @@ try:
 except clickhouse_connect.driver.exceptions.DatabaseError as e:
     st.error(f"Database setup error: {e}")
 
+# Fetch the data
 query = "SELECT * FROM Movies.Final;"
 try:
     Movies_Combined_final = pd.DataFrame(client.query(query).result_rows, columns=["Movie_ID", "Title", "Tags"])
 except clickhouse_connect.driver.exceptions.DatabaseError as e:
     st.error(f"Query execution error: {e}")
     st.stop()
+
     
-
-
 
 # Preprocess tags
 CV = CountVectorizer(max_features=5000, stop_words='english')
@@ -116,4 +119,3 @@ st.sidebar.title('Navigation')
 selection = st.sidebar.radio("Go to", list(PAGES.keys()))
 page = PAGES[selection]
 page()
-
