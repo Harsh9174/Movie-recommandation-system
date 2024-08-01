@@ -12,28 +12,42 @@ from sklearn.feature_extraction.text import CountVectorizer
 import sys
 import json
 
-def Click_house_cloud():
-    CLICKHOUSE_CLOUD_HOSTNAME = 'nxefycxt62.eastus2.azure.clickhouse.cloud'
-    CLICKHOUSE_CLOUD_USER = 'default'
-    CLICKHOUSE_CLOUD_PASSWORD = 'ZoNOGOZPSv61~'
+import os
 
+# Load environment variables
+CLICKHOUSE_CLOUD_HOSTNAME = os.getenv('CLICKHOUSE_CLOUD_HOSTNAME', 'nxefycxt62.eastus2.azure.clickhouse.cloud')
+CLICKHOUSE_CLOUD_USER = os.getenv('CLICKHOUSE_CLOUD_USER', 'default')
+CLICKHOUSE_CLOUD_PASSWORD = os.getenv('CLICKHOUSE_CLOUD_PASSWORD', 'ZoNOGOZPSv61~')
+
+def get_clickhouse_client():
     client = clickhouse_connect.get_client(
-        host=CLICKHOUSE_CLOUD_HOSTNAME, 
-        port=8443, 
-        username=CLICKHOUSE_CLOUD_USER, 
+        host=CLICKHOUSE_CLOUD_HOSTNAME,
+        port=8443,
+        username=CLICKHOUSE_CLOUD_USER,
         password=CLICKHOUSE_CLOUD_PASSWORD
     )
     return client
 
-client = Click_house_cloud()
-Database = "Create Database IF NOT EXISTS Movies"
-Use_db = "Use Movies"
-result_db = client.command(Database)
-result_use = client.command(Use_db)
-query = "SELECT * FROM Movies.Final;"
+client = get_clickhouse_client()
 
-# Execute the query and fetch the data
-Movies_Combined_final = pd.DataFrame(client.query(query).result_rows,columns=["Movie_ID","Title","Tags"])
+# Setup the database and table
+try:
+    client.command("CREATE DATABASE IF NOT EXISTS Movies")
+    client.command("USE Movies")
+except clickhouse_connect.driver.exceptions.DatabaseError as e:
+    st.error(f"Database setup error: {e}")
+
+# Fetch the data
+query = "SELECT * FROM Movies.Final;"
+try:
+    result = client.query(query)
+    Movies_Combined_final = pd.DataFrame(result.result_rows, columns=["Movie_ID", "Title", "Tags"])
+except clickhouse_connect.driver.exceptions.DatabaseError as e:
+    st.error(f"Query execution error: {e}")
+    st.stop()
+except Exception as e:
+    st.error(f"Unexpected error: {e}")
+    st.stop()
 
 CV = CountVectorizer(max_features=5000,stop_words='english')
 
