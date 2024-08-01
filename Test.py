@@ -126,8 +126,7 @@ def model_page():
 def Movie_Entry():
     
 
-# ClickHouse connection details
-    client = Click_house_cloud()
+# ClickHouse connection detail
 
     def insert_data(Movie_ID,Title,Tags):
         query = """
