@@ -11,24 +11,18 @@ from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import CountVectorizer
 import sys
 import json
-
 import os
 
-# Load environment variables
-CLICKHOUSE_CLOUD_HOSTNAME = os.getenv('CLICKHOUSE_CLOUD_HOSTNAME', 'nxefycxt62.eastus2.azure.clickhouse.cloud')
-CLICKHOUSE_CLOUD_USER = os.getenv('CLICKHOUSE_CLOUD_USER', 'default')
-CLICKHOUSE_CLOUD_PASSWORD = os.getenv('CLICKHOUSE_CLOUD_PASSWORD', 'ZoNOGOZPSv61~')
 
-def get_clickhouse_client():
+if __name__ == '__main__':
     client = clickhouse_connect.get_client(
-        host=CLICKHOUSE_CLOUD_HOSTNAME,
-        port=8443,
-        username=CLICKHOUSE_CLOUD_USER,
-        password=CLICKHOUSE_CLOUD_PASSWORD
+        host='nxefycxt62.eastus2.azure.clickhouse.cloud',
+        user='default',
+        password='ZoNOGOZPSv61~',
+        secure=True
     )
-    return client
-
-client = get_clickhouse_client()
+    print("Result:", client.query("SELECT 1").result_set[0][0])
+# Load environment variables
 
 # Setup the database and table
 try:
