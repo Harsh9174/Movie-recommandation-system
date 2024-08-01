@@ -13,16 +13,20 @@ import sys
 import json
 import os
 
+CLICKHOUSE_CLOUD_HOSTNAME = os.getenv('CLICKHOUSE_CLOUD_HOSTNAME', 'nxefycxt62.eastus2.azure.clickhouse.cloud')
+CLICKHOUSE_CLOUD_USER = os.getenv('CLICKHOUSE_CLOUD_USER', 'default')
+CLICKHOUSE_CLOUD_PASSWORD = os.getenv('CLICKHOUSE_CLOUD_PASSWORD', 'ZoNOGOZPSv61~')
 
-if __name__ == '__main__':
+def get_clickhouse_client():
     client = clickhouse_connect.get_client(
-        host='nxefycxt62.eastus2.azure.clickhouse.cloud',
-        user='default',
-        password='ZoNOGOZPSv61~',
-        secure=True
+        host=CLICKHOUSE_CLOUD_HOSTNAME,
+        port=8443,
+        username=CLICKHOUSE_CLOUD_USER,
+        password=CLICKHOUSE_CLOUD_PASSWORD
     )
-    print("Result:", client.query("SELECT 1").result_set[0][0])
-# Load environment variables
+    return client
+
+client = get_clickhouse_client()
 
 # Setup the database and table
 try:
@@ -32,7 +36,7 @@ except clickhouse_connect.driver.exceptions.DatabaseError as e:
     st.error(f"Database setup error: {e}")
 
 # Fetch the data
-query = "SELECT * FROM Movies.Final;"
+query = "SELECT * FROM Movies.Final"
 try:
     result = client.query(query)
     Movies_Combined_final = pd.DataFrame(result.result_rows, columns=["Movie_ID", "Title", "Tags"])
