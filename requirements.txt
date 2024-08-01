@@ -1,3 +1,7 @@
 clickhouse-connect==0.5.23
+streamlit
+pandas
+scikit-learn
+requests
+clickhouse-connect
 nltk
-sklearn
