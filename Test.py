@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import pickle
 import requests
-from main import Click_house_cloud
 import clickhouse_connect
 import re
 import ast
@@ -10,6 +9,28 @@ import nltk
 from nltk.stem.porter import PorterStemmer
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import CountVectorizer
+import sys
+import json
+
+def Click_house_cloud():
+    CLICKHOUSE_CLOUD_HOSTNAME = 'nxefycxt62.eastus2.azure.clickhouse.cloud'
+    CLICKHOUSE_CLOUD_USER = 'default'
+    CLICKHOUSE_CLOUD_PASSWORD = 'ZoNOGOZPSv61~'
+
+    client = clickhouse_connect.get_client(
+        host=CLICKHOUSE_CLOUD_HOSTNAME, 
+        port=8443, 
+        username=CLICKHOUSE_CLOUD_USER, 
+        password=CLICKHOUSE_CLOUD_PASSWORD
+    )
+    return client
+
+def Connector():
+    client = Click_house_cloud()
+    return "Connected"
+
+if __name__ == "__main__":
+    Connector()
 
 client = Click_house_cloud()
 Database = "Create Database IF NOT EXISTS Movies"
